@@ -93,8 +93,8 @@ export class MailReceiver extends EventEmitter{
                 simpleParser(stream)
                   .then(mail => {
                     this.emit('mail', {uid, ...mail});
-                  }).catch(err => {
-                    console.log(err)
+                  }).catch(error => {
+                    this.emit('error', error);
                   })
               });
             });
