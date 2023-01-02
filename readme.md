@@ -31,19 +31,21 @@ const config = {
     }
 };
 
-const mail = new MailReceiver(config);
+const mailReceiver = new MailReceiver(config);
 
-mail.on('end', () => console.log(`${imap.user} offline`))
-mail.on('connected', () => console.log(` ${imap.user} logged`))
-mail.on('error', err => console.log(err))
-mail.on('mail', mail => 
+mailReceiver.on('end', () => console.log(`${imap.user} offline`))
+mailReceiver.on('connected', () => console.log(` ${imap.user} logged`))
+mailReceiver.on('error', err => console.log(err))
+mailReceiver.on('mail', mail => 
   console.log(
     mail.headers.get('subject'),
     mail.from,
     mail.textAsHtml
   )
+
+  mailReceiver.markSeen(mail.uid)
 )
-.start()
+mailReceiver.start()
 
 ```
 
@@ -53,6 +55,19 @@ mail.on('mail', mail =>
   value: [ { address: 'email@email.com', name: 'Pedro Entringer' } ],
   html: 'email in html',
   text: 'email in text' 
+}
+```
+
+## Default Options
+```javascript
+{
+  tls: true,
+  markSeen: false,
+  box: "INBOX",
+  search: ["UNSEEN"],
+  tlsOptions: {
+    rejectUnauthorized: false
+  }
 }
 ```
 
