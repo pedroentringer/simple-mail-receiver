@@ -1,6 +1,6 @@
 {
   "name": "simple-mail-receiver",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "IMAP simple mail receiver",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -32,6 +32,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pedroentringer/cheerio-table-parser"
+    "url": "git+https://github.com/pedroentringer/simple-mail-receiver"
   }
 }
