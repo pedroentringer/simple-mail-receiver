@@ -1,6 +1,6 @@
 {
   "name": "simple-mail-receiver",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "IMAP simple mail receiver",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
