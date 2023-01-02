@@ -1,0 +1,37 @@
+{
+  "name": "simple-mail-receiver",
+  "version": "1.0.0",
+  "description": "IMAP simple mail receiver",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "author": {
+    "name": "Pedro Entringer",
+    "email": "hi@pedroentringer.dev",
+    "url": "https://pedroentringer.dev"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/imap": "^0.8.35",
+    "@types/mailparser": "^3.4.0",
+    "@types/node": "^16.9.6",
+    "typescript": "^3.8.3"
+  },
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "prepare": "npm run build",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "dependencies": {
+    "imap": "^0.8.19",
+    "mailparser": "^2.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pedroentringer/cheerio-table-parser"
+  }
+}
