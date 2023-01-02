@@ -2,7 +2,6 @@ import * as Imap from 'imap'
 import { simpleParser } from 'mailparser'
 import * as EventEmitter from 'node:events'
 
-
 type Options = Partial<Imap.Config> & {
   markSeen: boolean
   box: string
@@ -19,7 +18,7 @@ const DEFAULT_OPTIONS: Options = {
   }
 }
 
-class MailReceiver extends EventEmitter{
+export class MailReceiver extends EventEmitter{
   private options: Options
   private imap: Imap
 
@@ -106,5 +105,3 @@ class MailReceiver extends EventEmitter{
     return this;
   };
 }
-
-export default MailReceiver

@@ -18,7 +18,7 @@ npm install simple-mail-receiver -S
 ### Simple use
 
 ``` javascript
-import MailReceiver from 'simple-mail-receiver'
+import { MailReceiver } from 'simple-mail-receiver'
 
 const config = {
     user: "mail@domain.com",
