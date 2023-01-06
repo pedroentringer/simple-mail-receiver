@@ -1,6 +1,7 @@
 import * as Imap from 'imap'
-import { simpleParser } from 'mailparser'
+import { ParsedMail, simpleParser } from 'mailparser'
 import * as EventEmitter from 'node:events'
+import TypedEmitter from "typed-emitter"
 
 type Options = Partial<Imap.Config> & {
   markSeen: boolean
@@ -18,7 +19,17 @@ const DEFAULT_OPTIONS: Options = {
   }
 }
 
-export class MailReceiver extends EventEmitter{
+type Mail = { uid: string } & ParsedMail 
+
+type MailReceiverEvents = {
+  error: (error: Error) => void,
+  ready: () => void
+  end: () => void
+  close: (hasError: boolean) => void
+  uidvalidity: (uidValidity: number) => void
+  mail: (parsedMail: Mail) => void
+}
+export class MailReceiver extends (EventEmitter as new () => TypedEmitter<MailReceiverEvents>) {
   private options: Options
   private imap: Imap
 
@@ -88,11 +99,12 @@ export class MailReceiver extends EventEmitter{
         fetch.on('message', (msg) => {
             msg.once('body', (stream) => {
               msg.once('attributes', (attrs) => {
-                const uid = attrs.uid;
+                const uid = attrs.uid as string || "";
 
                 simpleParser(stream)
                   .then(mail => {
-                    this.emit('mail', {uid, ...mail});
+                    const parsedMail: Mail = {uid, ...mail}
+                    this.emit('mail', parsedMail);
                   }).catch(error => {
                     this.emit('error', error);
                   })
