@@ -26,6 +26,7 @@ const config = {
     host: "imap.hostimap.com",
     port: 993,
     tls: true,
+    autoReconnect: true,
     tlsOptions: {
         rejectUnauthorized: false
     }
@@ -37,11 +38,12 @@ mailReceiver.on('end', () => console.log(`${imap.user} offline`))
 mailReceiver.on('connected', () => console.log(` ${imap.user} logged`))
 mailReceiver.on('error', err => console.log(err))
 mailReceiver.on('mail', mail => 
-  console.log(
-    mail.headers.get('subject'),
-    mail.from,
-    mail.textAsHtml
-  )
+  console.log({
+    subject: mail.headers.get('subject'),
+    from: mail.from,
+    html: mail.textAsHtml,
+    text: mail.text
+  })
 
   mailReceiver.markSeen(mail.uid)
 )
@@ -52,7 +54,8 @@ mailReceiver.start()
 #### Result
 ```shell
 { 
-  value: [ { address: 'email@email.com', name: 'Pedro Entringer' } ],
+  subject: "Mail subject",
+  from: { value: [ { address: 'email@email.com', name: 'Pedro Entringer' } ] },
   html: 'email in html',
   text: 'email in text' 
 }
@@ -65,6 +68,7 @@ mailReceiver.start()
   markSeen: false,
   box: "INBOX",
   search: ["UNSEEN"],
+  autoReconnect: false,
   tlsOptions: {
     rejectUnauthorized: false
   }

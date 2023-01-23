@@ -6,6 +6,7 @@ type Options = Partial<Imap.Config> & {
   markSeen: boolean
   box: string
   search: string[]
+  autoReconnect: boolean
 }
 
 const DEFAULT_OPTIONS: Options = {
@@ -13,6 +14,7 @@ const DEFAULT_OPTIONS: Options = {
   markSeen: false,
   box: "INBOX",
   search: ["UNSEEN"],
+  autoReconnect: false,
   tlsOptions: {
     rejectUnauthorized: false
   }
@@ -37,6 +39,10 @@ export declare interface MailReceiver {
     event: U, ...args: Parameters<MailReceiverEvents[U]>
   ): boolean;
 }
+
+type MailError = {
+  code?: string
+} & Error
 export class MailReceiver extends EventEmitter{
   private options: Options
   private imap: Imap
@@ -47,17 +53,25 @@ export class MailReceiver extends EventEmitter{
     this.imap = new Imap(this.options as Imap.Config);
   }
 
+  private errorHandler(error: MailError){
+    if(error?.code === "ETIMEDOUT" && this.options.autoReconnect){
+      this.imap.connect();
+    }else{
+      this.emit('error', error)
+    }
+  }
+
   start(){
     this.imap.once('end', () => this.emit('end'));
-    this.imap.once('error', (error: Error) => this.emit('error', error));
+    this.imap.once('error', (error: MailError) => this.errorHandler(error));
     this.imap.once('close', (hasError: boolean) => this.emit('close', hasError));
     this.imap.once('uidvalidity', (uidValidity: number) => this.emit('uidvalidity', uidValidity));
 
     this.imap.once('ready', () => {
         this.emit('ready');
-        this.imap.openBox(this.options.box, false, (err) => {
-            if (err) {
-                this.emit('error', err);
+        this.imap.openBox(this.options.box, false, (error) => {
+            if (error) {
+                this.errorHandler(error)
                 return;
             }
 
@@ -75,7 +89,7 @@ export class MailReceiver extends EventEmitter{
   markSeen(uid: number){
     this.imap.addFlags(uid, ['\\Seen'], (error) => {
       if (error) {
-        this.emit("error", error)
+        this.errorHandler(error)
       }
     });
   }
@@ -89,9 +103,9 @@ export class MailReceiver extends EventEmitter{
   }
 
   private scan() {
-    this.imap.search(this.options.search, (err, searchResults) => {
-        if (err) {
-            this.emit('error', err);
+    this.imap.search(this.options.search, (error, searchResults) => {
+        if (error) {
+            this.errorHandler(error)
             return;
         }
 
@@ -113,13 +127,13 @@ export class MailReceiver extends EventEmitter{
                   .then(mail => {
                     this.emit('mail', {uid, ...mail});
                   }).catch(error => {
-                    this.emit('error', error);
+                    this.errorHandler(error)
                   })
               });
             });
         });
         
-        fetch.once('error', (error) => this.emit('error', error));
+        fetch.once('error', (error) => this.errorHandler(error));
     });
     return this;
   };
