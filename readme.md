@@ -1,12 +1,5 @@
 # Simple Mail Receiver
 
-## Dependencies
-
-| Lib | Version |
-|--|--|
-|imap  | ^0.8.19 |
-| mailparser | ^2.2.0 |
-
 
 ## Install
 ```shell
